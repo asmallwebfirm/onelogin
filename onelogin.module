@@ -37,7 +37,7 @@ function onelogin_menu() {
     'title' => 'SAML Consumer',
     'page callback' => 'onelogin_consume',
     'file' => 'includes/onelogin.consume.inc',
-    'access callback' => array(1),
+    'access callback' => TRUE,
     'type' => MENU_CALLBACK,
   );
 
