@@ -1,6 +1,7 @@
 <?php
 
 /**
+ * @file
  * OneLogin SAML response callback handler and associated functionality.
  */
 
