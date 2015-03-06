@@ -13,7 +13,7 @@
  */
 function onelogin_consume() {
   // Check if this user already has a valid session.
-  if (drupal_session_started()) {
+  if (drupal_session_started() && $GLOBALS['user']->uid > 0) {
     watchdog('onelogin', 'Authentication attempt was made despite a pre-existing session for !user.', array(
       '!user' => l($GLOBALS['user']->mail, 'user/' . $GLOBALS['user']->uid),
     ), WATCHDOG_INFO);
