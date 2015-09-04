@@ -65,6 +65,7 @@ function onelogin_uninstall() {
     'onelogin_login_url',
     'onelogin_autoprovision',
     'onelogin_autoprovision_email_pregmatch',
+    'onelogin_required_globally',
   );
 
   foreach ($vars as $var) {

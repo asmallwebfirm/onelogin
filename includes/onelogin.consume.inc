@@ -30,7 +30,10 @@ function onelogin_consume() {
 
       // If the response is valid, attempt to authenticate the user.
       if ($response->isValid()) {
-        onelogin_auth($response);
+        // If authentication succeeded, ensure we redirect to the expected page.
+        if (onelogin_auth($response)) {
+          onelogin_auth_prepare_redirect($settings);
+        }
       }
       else {
         watchdog('onelogin', 'Authentication attempt failed: an invalid SAML response was given.', array(), WATCHDOG_ERROR);
@@ -133,6 +136,29 @@ function onelogin_auth_provision(OneLogin_Saml_Response $response) {
 
 
 /**
+ * Given a SAML Settings object, parses out potential destination params and if
+ * one is set, sets up the global state so that the current request will be
+ * redirected to the destination.
+ *
+ * Note: this is secure because drupal_goto will refuse to redirect to an
+ * external URL.
+ *
+ * @param OneLogin_Saml_Settings $settings
+ *   The onelogin saml settings object.
+ *
+ * @see onelogin_get_settings()
+ * @see drupal_goto()
+ * @see onelogin_consume()
+ */
+function onelogin_auth_prepare_redirect(OneLogin_Saml_Settings $settings) {
+  $redirect = drupal_parse_url($settings->spReturnUrl);
+  if (isset($redirect['query']['destination'])) {
+    $_GET['destination'] = $redirect['query']['destination'];
+  }
+}
+
+
+/**
  * Creates and returns a OneLogin settings object.
  *
  * @return OneLogin_Saml_Settings
@@ -140,10 +166,24 @@ function onelogin_auth_provision(OneLogin_Saml_Response $response) {
  */
 function onelogin_get_settings() {
   if (class_exists('OneLogin_Saml_Settings')) {
+    $urlOptions = array(
+      'absolute' => TRUE,
+    );
+
+    // @see onelogin_require_authentication()
+    if (isset($_SERVER['HTTP_REFERER']) && !empty($_SERVER['HTTP_REFERER'])) {
+      $referer = drupal_parse_url($_SERVER['HTTP_REFERER']);
+      if (isset($referer['query']['originalRefererPath'])) {
+        $urlOptions['query'] = array(
+          'destination' => $referer['query']['originalRefererPath'],
+        );
+      }
+    }
+
     $settings = new OneLogin_Saml_Settings();
     $settings->idpSingleSignOnUrl = variable_get('onelogin_login_url', '');
     $settings->idpPublicCertificate = variable_get('onelogin_cert', '');
-    $settings->spReturnUrl = url('onelogin_saml/consumer', array('absolute' => TRUE));
+    $settings->spReturnUrl = url('onelogin_saml/consumer', $urlOptions);
     $settings->spIssuer = 'onelogin_saml';
     return $settings;
   }

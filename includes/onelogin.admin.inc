@@ -31,6 +31,12 @@ function onelogin_settings_form() {
     '#description' => t('You can find this url by editing your Drupal Application in OneLogin.'),
     '#required' => TRUE,
   );
+  $form['global']['onelogin_required_globally'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Require authentication via OneLogin globally'),
+    '#default_value' => variable_get('onelogin_required_globally', FALSE),
+    '#description' => t('Forces user authentication via OneLogin across every page on the site. Useful for internal sites and intranets.'),
+  );
 
   // Configurations related to user auto-provisioning.
   $form['provisioning'] = array(

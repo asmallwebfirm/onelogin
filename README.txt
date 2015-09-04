@@ -40,6 +40,7 @@ user authentication and user auto-provisioning via OneLogin.
 
 ### Additional configurations
 
+__Automatic Drupal user provisioning__
 In addition to the above, this module provides a basic mechanism for automatic
 Drupal user provisioning. This works by automatically creating Drupal users when
 a valid SAML response is provided by OneLogin, but a corresponding user does not
@@ -51,6 +52,21 @@ except with the "@" sign replaced with a period.
 
 In some situations, you may wish to limit user auto-provisioning to a certain
 subset of e-mail addresses; this can be done via regular expression matching.
+
+__Requiring authentication via OneLogin__
+In cases where your Drupal application serves as an Intranet or other internal
+portal where it makes sense to lock down access to authenticated users, you can
+check the "Require authentication via OneLogin globally" box. This will ensure
+that all un-authenticated requests to your user app are sent to OneLogin for
+authentication.
+
+If you wish to conditionally restrict when authentication via OneLogin is
+required, you can install the Context module, and use the "Require
+authentication via OneLogin" context reaction for whatever conditions you deem
+appropriate.
+
+In both cases, if the user is already authenticated to OneLogin, they will never
+see a form; they'll simply be logged in automatically.
 
 ---------------------------------------
 
