@@ -62,12 +62,13 @@ function onelogin_permission() {
  */
 function onelogin_init() {
   $isMaintenanceMode = variable_get('maintenance_mode', FALSE);
+  $isCLI = drupal_is_cli();
   $authRequiredGlobally = variable_get('onelogin_required_globally', FALSE);
-  $isSamlConsumer = request_path() === 'onelogin_saml/consumer';
+  $isSamlConsumer = strpos(request_path(), 'onelogin_saml/consumer') === 0;
   $contextEnabled = module_exists('context');
 
   // If OneLogin authentication is required globally, attempt it.
-  if ($authRequiredGlobally && !$isSamlConsumer && !$isMaintenanceMode) {
+  if ($authRequiredGlobally && !$isSamlConsumer && !$isMaintenanceMode && !$isCLI) {
     onelogin_require_authentication();
   }
 
@@ -155,7 +156,8 @@ function onelogin_require_authentication() {
     drupal_goto($loginUrl, array(
       'query' => array(
         // @see onelogin_get_settings()
-        'originalRefererPath' => request_path(),
+        // Note: request_uri() vs. request_path() to persist query params.
+        'originalRefererPath' => request_uri(),
       ),
     ));
   }
