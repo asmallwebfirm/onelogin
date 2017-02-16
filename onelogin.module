@@ -41,6 +41,9 @@ function onelogin_menu() {
     'type' => MENU_CALLBACK,
   );
 
+  // OneLogin may use this callback, rather than the one above.
+  $items['onelogin_saml/acs'] = $items['onelogin_saml/consumer'];
+
   return $items;
 }
 
